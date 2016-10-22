@@ -1,88 +1,134 @@
 user = require('../models/user.js');
+skills = require('../models/skillz');
+secrets = require('../models/secrets');
 
 module.exports = {
     getName(req, res, next) {
-        return res.status(200).json({name: personal.name});
+        res.status(200).json({
+            'name': user.name
+        });
     },
-     getLocation(req, res, next) {
-        return res.status(200).json({location: personal.location});
+    getLocation(req, res, next) {
+        res.status(200).json({
+            'location': user.location
+        });
     },
-     getOccupations(req, res, next) {
-        return res.status(200).json({occupations: personal.occupations});
-    },
-     getLatestOccupation(req, res, next) {
-        return res.status(200).json({occupations: personal.occupations[personal.occupations.length - 1]});
-    },
-     getHobbies(req, res, next) {
-        return res.status(200).json({hobbies: personal.hobbies } );
-    },
-     getHobbiesByType(req, res, next) {
-        let results = personal.hobbies.filter(hobby => {
-          if (req.params.type === hobby.type) {
-            return true;
-          }
-          return false;
-        } );
-        return res.status(200).json({hobbies: results});
-    },
-     sortOccupations(req, res, next) {
-        if ( req.query.order === 'desc' ) {
-          return res.status(200).json(personal.occupations.sort());
+    getOccupations: function(req, res, next) {
+        switch (req.query.order) {
+            case 'asc':
+                var occupations = user.occupations.sort();
+                break;
+            case 'desc':
+                var occupations = user.occupations.reverse();
+                break;
+            default:
+                var occupations = user.occupations;
+                break;
         }
-        else if (req.query.order === 'asc') {
-          return res.json(personal.occupations.reverse());
+
+        switch (req.query.name) {
+            case 'Husband':
+                var nameQueriedOccupations = 'Husband';
+                break;
+            case 'Father':
+                var nameQueriedOccupations = 'Father';
+                break;
+            case 'Ninja Jedi Starlord Programmer':
+                var nameQueriedOccupations = 'Ninja Jedi Starlord Programmer';
+                break;
+            default:
+                var nameQueriedOccupations = occupations;
+                break;
         }
+
+        res.status(200).json({
+            'occupations': nameQueriedOccupations
+        });
+
     },
-     changeName(req, res, next) {
-        personal.name = req.params.name;
-        return res.status(200).json( personal );
+    getLatestOccupation(req, res, next) {
+        res.status(200).json({
+            'latestOccupation': user.occupations[user.occupations.length - 1]
+        });
     },
-     changeLocation(req, res, next) {
-        personal.location = req.params.location;
-        return res.status(200).json(personal);
-    }
-    , addHobby(req, res, next) {
-        personal.hobbies.push( { name: req.body.name, type: req.body.type } );
-        return res.status(200).json(personal);
+    getHobbies(req, res, next) {
+        res.status(200).json({
+            'hobbies': user.hobbies
+        });
     },
-     addOccupation(req, res, next) {
-        personal.occupations.push(req.body.occupation);
-        return res.status(200).json(personal);
+    getHobbiesByType(req, res, next) {
+        let type = req.params.type;
+        let results = user.hobbies.filter(hobby => {
+            return hobby.type === type;
+        });
+        res.status(200).json({
+            'hobbies': results
+        });
+    },
+    changeName(req, res, next) {
+        user.name = req.params.name;
+        res.status(200).json({
+            'name': user.name
+        });
+    },
+    changeLocation(req, res, next) {
+        user.location = req.params.location;
+        res.status(200).json({
+            'location': user.location
+        });
+    },
+    addHobby(req, res, next) {
+        user.hobbies.push({
+            'name': req.body.name,
+            'type': req.body.type
+        });
+        res.status(200).json({
+            'hobbies': user.hobbies
+        });
+    },
+    addOccupation(req, res, next) {
+        user.occupations.push(req.body.occupation);
+        res.status(200).json({
+            'occupations': user.occupations
+        });
     },
 
-     getSkills(req, res, next) {
-        return res.status(200).json(skills);
+    getSkillsByExperience(req, res, next) {
+        let exp = req.query.experience;
+        let result = exp ? skills.filter(skill => {
+            return skill.experience === exp;
+        }) : skills;
+        res.status(200).json(result);
     },
-     getSkillsByExperience(req, res, next) {
-        let results = [];
-        for ( let i = 0; i < skills.length; i++ ) {
-            if (req.query.experience === skills[ i ].experience) {
-                results.push( skills[ i ] );
-            }
-        }
-        return res.status(200).json(results);
+    getSkills(req, res, next) {
+        let name = req.params.name;
+        let results = skills.filter(skill => {
+            return skill.name === name;
+        });
+        res.status(200).json(results);
     },
-     addSkills(req, res, next) {
-        skills.push( {
-          id: req.body.id,
-           name: req.body.name,
-           experience: req.body.experience
-        } );
-        return res.status(200).json(skills);
+    addSkills(req, res, next) {
+        skills.push({
+            'id': req.body.id,
+            'name': req.body.name,
+            'experience': req.body.experience
+        });
+        res.status(200).json(skills);
     },
-     getSkillsLength() {
-        return skills.length;
+    getSecrets(req, res, next) {
+        res.status(200).json(secrets);
     },
-
-     searchHobbies(req, res, next) {
-        let hobbies = personal.hobbies.filter( hobby => req.query.hobby === hobby.name);
-        return res.status(200).json( hobbies );
+    searchHobbies(req, res, next) {
+        let hobbies = personal.hobbies.filter(hobby => req.query.hobby === hobby.name);
+         res.status(200).json(hobbies);
     },
      searchOccupations(req, res, next) {
         let occupations = personal.occupations.filter( occupation => req.params.occupation === occupation);
-        return res.status(200).json( occupations );
+         res.status(200).json(occupations);
     },
      searchSkills(req, res, next) {
-        let someSkills = skills.filter( skill => req.query.name === skill.name);
-        return res.status(200).json(someSkills);
+        let someSkills = skills.filter(skill => req.query.name === skill.name);
+         res.status(200).json(someSkills);
     }
+
+};
