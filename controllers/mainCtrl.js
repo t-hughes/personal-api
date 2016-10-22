@@ -1,134 +1,127 @@
-user = require('../models/user.js');
-skills = require('../models/skillz');
-secrets = require('../models/secrets');
+var user = require('../models/user');
+    skills = require('../models/skills');
+    secrets = require('../models/secrets');
 
 module.exports = {
-    getName(req, res, next) {
-        res.status(200).json({
-            'name': user.name
-        });
+  //GET
+    getName: function(req, res) {
+        res.status(200).json(user.name);
     },
-    getLocation(req, res, next) {
-        res.status(200).json({
-            'location': user.location
-        });
+    getLocation: function(req, res) {
+        res.status(200).json(user.location);
     },
-    getOccupations: function(req, res, next) {
+    getOccupations: function(req, res) {
         switch (req.query.order) {
             case 'asc':
-                var occupations = user.occupations.sort();
+                res.status(200).json(user.occupations.reverse());
                 break;
             case 'desc':
-                var occupations = user.occupations.reverse();
+                res.status(200).json(user.occupations.sort());
                 break;
             default:
-                var occupations = user.occupations;
-                break;
-        }
-
-        switch (req.query.name) {
-            case 'Husband':
-                var nameQueriedOccupations = 'Husband';
-                break;
-            case 'Father':
-                var nameQueriedOccupations = 'Father';
-                break;
-            case 'Ninja Jedi Starlord Programmer':
-                var nameQueriedOccupations = 'Ninja Jedi Starlord Programmer';
-                break;
-            default:
-                var nameQueriedOccupations = occupations;
-                break;
-        }
-
-        res.status(200).json({
-            'occupations': nameQueriedOccupations
-        });
-
+                res.status(200).json(user.occupations);
+            }
     },
-    getLatestOccupation(req, res, next) {
-        res.status(200).json({
-            'latestOccupation': user.occupations[user.occupations.length - 1]
-        });
+    getOccupationsLatest: function(req, res) {
+        res.status(200).json(user.occupations[user.occupations.length]);
     },
-    getHobbies(req, res, next) {
-        res.status(200).json({
-            'hobbies': user.hobbies
+    getHobbies: function(req, res) {
+      if(req.params.type){
+        var filtered = user.hobbies.filter(function(item){
+          return item.type.toLowerCase() === req.params.type.toLowerCase();
         });
+        res.status(200).json({hobbies: filtered});
+      }
+        res.status(200).json({hobbies: user.hobbies});
     },
-    getHobbiesByType(req, res, next) {
-        let type = req.params.type;
-        let results = user.hobbies.filter(hobby => {
-            return hobby.type === type;
+    getFamily: function(req, res) {
+      if(req.params.gender){
+        var filtered = user.family.filter(function(item){
+          return item.gender.toLowerCase() === req.params.gender.toLowerCase();
         });
-        res.status(200).json({
-            'hobbies': results
+        res.status(200).json({family: filtered});
+      }
+      if(req.query.relation){
+        var filtered = user.family.filter(function(item){
+          return item.relation.toLowerCase() === req.query.relation.toLowerCase();
         });
+        res(200).json({family: filtered});
+      }
+      res.status(200).json({family: user.family});
     },
-    changeName(req, res, next) {
-        user.name = req.params.name;
-        res.status(200).json({
-            'name': user.name
+    getRestaurants: function(req, res){
+      if(req.params.name){
+        var filtered = user.restaurants.filter(function(item){
+          return item.name.toLowerCase() === req.params.name.toLowerCase();
         });
-    },
-    changeLocation(req, res, next) {
-        user.location = req.params.location;
-        res.status(200).json({
-            'location': user.location
+        res.status(200).json({restaurants: filtered});
+      }
+      if(req.query.rating){
+        var filtered = user.restaurants.filter(function(item){
+          return item.rating === parseInt(req.query.rating);
         });
+        res(200).json({restaurants: filtered});
+      }
+      res.status(200).json({restaurants: user.restaurants});
     },
-    addHobby(req, res, next) {
-        user.hobbies.push({
-            'name': req.body.name,
-            'type': req.body.type
-        });
-        res.status(200).json({
-            'hobbies': user.hobbies
-        });
-    },
-    addOccupation(req, res, next) {
-        user.occupations.push(req.body.occupation);
-        res.status(200).json({
-            'occupations': user.occupations
-        });
-    },
-
-    getSkillsByExperience(req, res, next) {
-        let exp = req.query.experience;
-        let result = exp ? skills.filter(skill => {
-            return skill.experience === exp;
-        }) : skills;
-        res.status(200).json(result);
-    },
-    getSkills(req, res, next) {
-        let name = req.params.name;
-        let results = skills.filter(skill => {
-            return skill.name === name;
-        });
-        res.status(200).json(results);
-    },
-    addSkills(req, res, next) {
-        skills.push({
-            'id': req.body.id,
-            'name': req.body.name,
-            'experience': req.body.experience
-        });
-        res.status(200).json(skills);
-    },
-    getSecrets(req, res, next) {
+    getSkills : function(req, res){
+    if(req.query.experience){
+      var filtered = skills.skills.filter(function(item){
+        return item.experience.toLowerCase() === req.query.experience.toLowerCase();
+      });
+      res.status(200).json({skills: filtered});
+    }
+    res.status(200).json(skills.skills);
+  },
+    getSecrets: function(req, res) {
         res.status(200).json(secrets);
     },
-    searchHobbies(req, res, next) {
-        let hobbies = personal.hobbies.filter(hobby => req.query.hobby === hobby.name);
-         res.status(200).json(hobbies);
-    },
-     searchOccupations(req, res, next) {
-        let occupations = personal.occupations.filter( occupation => req.params.occupation === occupation);
-         res.status(200).json(occupations);
-    },
-     searchSkills(req, res, next) {
-        let someSkills = skills.filter(skill => req.query.name === skill.name);
-         res.status(200).json(someSkills);
-    }
 
+    //PUT
+    updateName: function(req, res) {
+        user.name = req.params.name;
+        res.status(200).send(user.name);
+    },
+    updateLocation: function(req, res) {
+        user.location = req.params.location;
+        res.status(200).send(user.location);
+    },
+
+    //POST
+  addHobby : function(req, res){
+    user.hobbies.push(req.body);
+    res.status(200).json(user.hobbies);
+  },
+  addOccupation : function(req, res){
+    user.occupations.push(req.params.occupation);
+    res.status(200).json(user.occupations);
+  },
+  addFamily : function(req, res){
+    user.family.push(req.body);
+    res.status(200).json(user.family);
+  },
+  addRestaurant : function(req, res){
+    user.restaurants.push(req.body);
+    res.status(200).json(user.restaurants);
+  },
+  addSkill : function(req, res){
+    skills.skills.push(req.body);
+    res.status(200).json(skills.skills);
+  }
+
+
+
+
+    // searchHobbies: function(req, res) {
+    //     var hobbies = personal.hobbies.filter(function(hobby) { req.query.hobby === hobby.name);
+    //      res.status(200).json(hobbies);
+    // },
+    //  searchOccupations: function(req, res ) {
+    //     var occupations = personal.occupations.filter( occupation => req.params.occupation === occupation);
+    //      res.status(200).json(occupations);
+    // },
+    //  searchSkills: function(req, res ) {
+    //     let someSkills = skills.filter(skill => req.query.name === skill.name);
+    //      res.status(200).json(someSkills);
+    // }
 };

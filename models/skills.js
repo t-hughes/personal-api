@@ -1,4 +1,4 @@
-const skills = [
+module.exports = { skills: [
   {
     "id": 1,
     "name": "Javascript",
@@ -24,5 +24,5 @@ const skills = [
     "name": "Node",
     "experience": "Beginner"
   }
-];
-module.exports = skills;
+]
+};

@@ -1,6 +1,6 @@
 //storing user object//
 //access by using module.exports//
-const user = {
+module.exports = { 
     name: "Talon Hughes",
     location: "Orem",
     occupations: ["Husband", "Father", "Ninja Jedi Starlord Programmer"],
@@ -48,4 +48,3 @@ const user = {
         rating: 4
     }]
 };
-module.exports = user;

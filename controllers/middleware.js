@@ -1,8 +1,7 @@
-const user = require('../models/user.js');
-// const mainCtrl = require('./controllers/mainCtrl.js');
+var skills = require('../models/skills');
 
 module.exports = {
-    addHeaders(req, res, next) {
+    addHeaders: function(req, res, next) {
         res.status(200).set({
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
@@ -12,20 +11,18 @@ module.exports = {
             'X-Frame-Options': 'SAMEORIGIN',
             'Content-Security-Policy': "default-src 'self' devmountain.github.io"
         });
-
         next();
     },
-    generateId(req, res, next) {
-        req.body.id = skill.length + 1;
+    generateId: function(req, res, next) {
+        req.body.id = skills.skills.length +1;
         next();
     },
-    verifyUser(req, res, next) {
-        if (req.body.username === 'thughes' && parseInt(req.body.pin) === 1234) {
-            next();
-        } else {
-            res.status(404).json({
-                'error': 'not authorized'
-            });
+    verifyUser: function(req, res, next) {
+        var username = 'thughes';
+        var pin = '1234';
+        if(req.params.username === uername && parseInt(req.params.pin) ===pin) {
+          next();
         }
-    }
+        res.status(401).json('Unauthorized User');
+      }
 };
